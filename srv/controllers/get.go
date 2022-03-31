@@ -18,12 +18,3 @@ func (ctrl Controllers) SayHi(c *gin.Context) {
 
 	return
 }
-
-func (ctrl Controllers) SayHiHi(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
-		"message": "HiHi",
-		"err":     nil,
-	})
-
-	return
-}

@@ -13,8 +13,8 @@ RUN apk add --no-cache git
 COPY . /usr/local/go/src/${PROJ_NAME}
 WORKDIR /usr/local/go/src/${PROJ_NAME}
 
-# # Run tests
-# RUN CGO_ENABLED=0 go test -timeout 30s -v github.com/gbaeke/go-template/pkg/api
+# Run tests
+RUN CGO_ENABLED=0 go test -timeout 30s -v /usr/local/go/src/${PROJ_NAME}/controllers
 
 # https://stackoverflow.com/a/68172023, skip
 # RUN go mod download

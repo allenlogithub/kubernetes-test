@@ -3,7 +3,7 @@ package server
 import (
 	"github.com/gin-gonic/gin"
 
-	controllers "srv/controllers"
+	"srv/controllers"
 )
 
 func NewRouter() *gin.Engine {
@@ -17,7 +17,6 @@ func NewRouter() *gin.Engine {
 		{
 			hi := new(controllers.Controllers)
 			hiGroup.GET("/hi", hi.SayHi)
-			hiGroup.GET("/hihi", hi.SayHiHi)
 		}
 	}
 

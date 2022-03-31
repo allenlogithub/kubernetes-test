@@ -5,4 +5,4 @@ mkdir -p "$d"
 cp -r server "$d"
 cp -r controllers "$d"
 
-go run main.go
+CGO_ENABLED=0 go test -v srv/controllers
