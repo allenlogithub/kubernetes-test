@@ -1,6 +1,5 @@
 # arguments for Go version
 ARG GO_VERSION=1.17
-ARG PROJ_NAME=srv
 
 # STAGE 1: building the executable
 FROM golang:${GO_VERSION}-alpine AS build
