@@ -1,9 +1,13 @@
 package main
 
 import (
-	server "srv/server"
+	"srv/config"
+	"srv/databases"
+	"srv/server"
 )
 
 func main() {
+	config.InitConfig()
+	databases.InitMysql()
 	server.InitServer()
 }

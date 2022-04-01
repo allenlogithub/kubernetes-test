@@ -1,6 +1,7 @@
 ARG GO_VERSION=1.17
 
 FROM golang:${GO_VERSION}-alpine
+ENV EXEC_ENV=dev
 
 RUN apk add --no-cache git
 

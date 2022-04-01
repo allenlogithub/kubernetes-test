@@ -13,10 +13,20 @@ func NewRouter() *gin.Engine {
 
 	v1 := router.Group("v1")
 	{
-		hiGroup := v1.Group("say")
+		sayGroup := v1.Group("say")
 		{
-			hi := new(controllers.Controllers)
-			hiGroup.GET("/hi", hi.SayHi)
+			say := new(controllers.Controllers)
+			sayGroup.GET("/hi", say.SayHi)
+		}
+		postGroup := v1.Group("post")
+		{
+			post := new(controllers.Controllers)
+			postGroup.POST("/content", post.PostContent)
+		}
+		getGroup := v1.Group("get")
+		{
+			get := new(controllers.Controllers)
+			getGroup.GET("/allcontent", get.GetAllContent)
 		}
 	}
 
