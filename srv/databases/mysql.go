@@ -42,17 +42,17 @@ func createMysqlDB(conn *sql.DB, dbName string) {
 func InitMysql() {
 	c := config.GetConfig()
 	cfg := mysql.Config{
-		User:   c.Get("databases.mysql.user").(string),
-		Passwd: c.Get("databases.mysql.password").(string),
-		Net:    c.Get("databases.mysql.net").(string),
-		Addr:   c.Get("databases.mysql.domain").(string) + ":" + c.Get("databases.mysql.port").(string),
+		User:   c.Databases.Mysql.User,
+		Passwd: c.Databases.Mysql.Password,
+		Net:    c.Databases.Mysql.Net,
+		Addr:   c.Databases.Mysql.Address,
 	}
 
 	connMysql = connectMysql(&cfg, "")
 	defer connMysql.Close()
-	createMysqlDB(connMysql, c.Get("databases.mysql.databaseName").(string))
+	createMysqlDB(connMysql, c.Databases.Mysql.DBName)
 
-	connMysql = connectMysql(&cfg, c.Get("databases.mysql.databaseName").(string))
+	connMysql = connectMysql(&cfg, c.Databases.Mysql.DBName)
 
 	q := `
 		CREATE TABLE IF NOT EXISTS content (

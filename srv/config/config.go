@@ -1,31 +1,48 @@
 package config
 
 import (
-	"log"
 	"os"
+)
 
-	"github.com/spf13/viper"
+type (
+	Config struct {
+		Databases Databases
+	}
+
+	Databases struct {
+		Mysql Mysql
+	}
+
+	Mysql struct {
+		Address  string
+		Net      string
+		User     string
+		Password string
+		DBName   string
+	}
 )
 
 var (
-	config *viper.Viper
-	env    string
+	config *Config
 )
 
 func InitConfig() {
-	config = viper.New()
-	env = os.Getenv("EXEC_ENV")
+	mysql := Mysql{
+		Address:  os.Getenv("MYSQL_ADDRESS"),
+		Net:      os.Getenv("MYSQL_NET"),
+		User:     os.Getenv("MYSQL_USER"),
+		Password: os.Getenv("MYSQL_PASSWORD"),
+		DBName:   os.Getenv("MYSQL_DBNAME"),
+	}
 
-	config.SetConfigType("yaml")
-	config.SetConfigName(env)
-	config.AddConfigPath("../config/")
-	config.AddConfigPath("config/")
-
-	if err := config.ReadInConfig(); err != nil {
-		log.Fatal("error on parsing configuration file")
+	databases := Databases{
+		Mysql: mysql,
+	}
+	config = &Config{
+		Databases: databases,
 	}
 }
 
-func GetConfig() *viper.Viper {
+func GetConfig() *Config {
 	return config
 }

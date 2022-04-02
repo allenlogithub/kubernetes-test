@@ -24,7 +24,7 @@ func TestSayHi(t *testing.T) {
 	if status := rec.Code; status != http.StatusOK {
 		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
 	}
-	if rec.Body.String() != `{"err":null,"message":"Hi"}` {
-		t.Errorf("handler returned wrong status code: got %v want %v", rec.Body.String(), `{"err":null,"message":"Hi"}`)
+	if rec.Body.String() != `{"data":null,"err":null,"message":"Hi"}` {
+		t.Errorf("handler returned wrong status code: got %v want %v", rec.Body.String(), `{"data":null,"err":null,"message":"Hi"}`)
 	}
 }
