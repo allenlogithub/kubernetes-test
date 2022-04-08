@@ -13,8 +13,8 @@ Node: minikube/IP
   
 APIs:  
 &emsp;GET:  
-&emsp;&emsp;IP/v1/say/hi  
-&emsp;&emsp;IP/v1/get/allcontent  
+&emsp;&emsp;IP:30007/v1/say/hi  
+&emsp;&emsp;IP:30007/v1/get/allcontent  
 &emsp;POST:  
-&emsp;&emsp;IP/v1/post/content  
+&emsp;&emsp;IP:30007/v1/post/content  
 &emsp;&emsp;&emsp;application/json {"content": "string"}  
