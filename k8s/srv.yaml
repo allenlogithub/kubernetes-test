@@ -27,12 +27,11 @@ spec:
         app: srv
     spec:
       containers:
-      # - image: outlier11111001000/srv:0.0.1.debug
       - image: outlier11111001000/srv:0.0.1
         name: srv
         env:
         - name: MYSQL_ADDRESS
-          value: 172.17.0.8:3306
+          value: mysql:3306
         - name: MYSQL_NET
           value: tcp
         - name: MYSQL_USER
