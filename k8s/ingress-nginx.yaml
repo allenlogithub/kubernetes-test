@@ -1,0 +1,36 @@
+apiVersion: networking.k8s.io/v1
+kind: IngressClass
+metadata:
+  labels:
+    app.kubernetes.io/component: controller
+  name: nginx
+  annotations:
+    ingressclass.kubernetes.io/is-default-class: "true"
+spec:
+  controller: k8s.io/ingress-nginx
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  #defaultBackend:
+  #  service:
+  #    name: srv
+  #    port:
+  #      number: 80
+  rules:
+    - host: nginx.info
+      http:
+        paths:
+          - path: /srv(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: srv
+                port:
+                  number: 80
