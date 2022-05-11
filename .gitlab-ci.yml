@@ -1,0 +1,89 @@
+# this pipeline will:
+#   download the git repo
+#   inspect the code quality
+#   build the program based on Docker
+#   push image to container registry
+#   ask remote VM to pull image
+#   deploy image
+
+stages:
+  - test
+  - publish
+  - deploy
+
+variables:
+  PROJ_VERSION: v0.0.19
+  TAG_LATEST: $DOMAIN/$PROJECT_NAME/$IMAGE_NAME:latest
+  TAG_CURR: $DOMAIN/$PROJECT_NAME/$IMAGE_NAME:$PROJ_VERSION
+  FF_NETWORK_PER_BUILD: "false"
+
+sonarqube-check:
+  image: 
+    name: sonarsource/sonar-scanner-cli:latest
+    entrypoint: [""]
+  stage: test
+  tags:
+    - deployment
+  variables:
+    SONAR_USER_HOME: "srv/.sonar"  # Defines the location of the analysis task cache
+    GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+  cache:
+    key: "go-srv-checking"
+    paths:      
+      - .sonar/cache
+  script: 
+    - pwd
+    - ls
+    - sonar-scanner
+  # allow_failure: true
+  only:
+    - main # or the name of your main branch
+
+publish:
+  image: docker:stable
+  stage: publish
+  tags:
+    - deployment
+  services:
+    - name: docker:dind
+      entrypoint: ["dockerd-entrypoint.sh"]
+      command: ["--insecure-registry", "https://$DOMAIN"]
+  # before_script:
+  #   - docker login $HARBOR_SERVER -u $HARBOR_USERNAME -p $HARBOR_PASSWORD
+  script:
+    - apk add --no-cache git
+    - git clone http://$DOMAIN/gitlab/Allen/kubernetes-test.git
+    - cd kubernetes-test/srv
+    - docker build -t $TAG_CURR -t $TAG_LATEST --build-arg PROJ_NAME=$IMAGE_NAME .
+    - export GPG_TTY=$(tty)
+    - docker login $HARBOR_SERVER -u $HARBOR_USERNAME -p $HARBOR_PASSWORD
+    - docker push $TAG_CURR
+    - docker push $TAG_LATEST
+  only:
+    - main
+
+deploy:
+  image: alpine:latest
+  stage: deploy
+  tags:
+    - deployment
+  script:
+    # - chmod og= $AWS_VM_CER
+    - apk update && apk add openssh-client
+    - echo "$AWS_VM_CER" >> devops.crt
+    - chmod 400 devops.crt
+    - cat devops.crt
+    - ssh -i devops.crt -o StrictHostKeyChecking=no $AWS_VM "sudo docker login $HARBOR_SERVER -u $HARBOR_USERNAME -p $HARBOR_PASSWORD"
+    - ssh -i devops.crt -o StrictHostKeyChecking=no $AWS_VM "sudo docker pull $TAG_CURR"
+    - ssh -i devops.crt -o StrictHostKeyChecking=no $AWS_VM "sudo docker container rm -f $IMAGE_NAME || true"
+    - ssh -i devops.crt -o StrictHostKeyChecking=no $AWS_VM "sudo docker run -d -p 100:80 --name $IMAGE_NAME --env MYSQL_ADDRESS=$MYSQL_ADDRESS --env MYSQL_NET=$MYSQL_NET --env MYSQL_USER=$MYSQL_USER --env MYSQL_PASSWORD=$MYSQL_PASSWORD --env MYSQL_DBNAME=$MYSQL_DBNAME $TAG_CURR"
+  # environment:
+  #   name: development
+  variables:
+    MYSQL_ADDRESS: 172.17.0.2:3306
+    MYSQL_NET: tcp
+    MYSQL_USER: root
+    MYSQL_PASSWORD: my-secret-pw
+    MYSQL_DBNAME: dev
+  only:
+    - main
